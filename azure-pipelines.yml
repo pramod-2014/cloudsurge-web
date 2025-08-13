@@ -1,17 +1,16 @@
 variables:
-  dockerRegistryServiceConnection: 'docker-hub-connection'  # Azure DevOps me Docker Hub service connection ka naam
-  imageRepository: 'your-dockerhub-username/your-image-name'
+  dockerRegistryServiceConnection: 'docker-hub-connection'
+  imageRepository: 'prmd77/cloudsurgeimag'
   dockerfilePath: 'Dockerfile'
-  tag: '$(Build.BuildId)'   # unique build tag
-  k8sNamespace: 'my-namespace'
-  k8sManifestFolder: 'manifests'  # yahi folder me tumhare YAML files hongi
+  tag: '$(Build.BuildId)'
+  k8sNamespace: 'prod'
+  k8sManifestFolder: 'manifests'
   nodeVersion: '18.x'
 
-
 trigger:
- branches:
-   include:
-     - main
+  branches:
+    include:
+      - main
 
 pool: 
   name: "Infra-Runners-pool"
@@ -24,20 +23,21 @@ stages:
     displayName: "NodeJs Tool Installation Stage"
     jobs:
       - job: "nodejsInstallJob"
-        displayName: "NPM Toll Installand build"
-
-
-    
+        displayName: "NPM Install and Build"
         steps:
         - task: NodeTool@0
           inputs:
             versionSource: 'spec'
             versionSpec: '18'
             checkLatest: true
-        - script:
+
+        - script: |
             npm install
             npm run build
+            mkdir -p $(Build.ArtifactStagingDirectory)
+            cp -r build/* $(Build.ArtifactStagingDirectory)/
           displayName: 'Install dependencies and build app'
+
         - task: PublishBuildArtifacts@1
           inputs:
             PathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -45,8 +45,7 @@ stages:
             publishLocation: 'Container'
         
 # ------------------------
-# # Stage 2: Docker Build & Push
-
+# Stage 2: Docker Build & Push
   - stage: DockerImage
     displayName: "Build and Push Docker Image"
     dependsOn: nodejsInstall
@@ -54,32 +53,42 @@ stages:
       - job: containerization
         displayName: "containerization"
         steps:
+        - task: DownloadBuildArtifacts@0
+          inputs:
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: 'drop'
+            downloadPath: '$(Pipeline.Workspace)'
+
         - task: Docker@2
           inputs:
             containerRegistry: 'DockerHubConnection'
             repository: 'prmd77/cloudsurgeimag'
             command: 'buildAndPush'
             Dockerfile: '**/Dockerfile'
+            buildContext: '$(Pipeline.Workspace)/drop'
+            tags: '$(Build.BuildId)'
          
-        
 # ------------------------
 # Stage 3: Deploy to Kubernetes
-
   - stage: "DeployToAKS"
-    displayName: "Deploy To Kebenetes"
+    displayName: "Deploy To Kubernetes"
+    dependsOn: DockerImage
     jobs:
       - job: "DeplpytoAKS"
         displayName: "DeployToKubernetes"
         steps:
+        - task: DownloadBuildArtifacts@0
+          inputs:
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: 'drop'
+            downloadPath: '$(Pipeline.Workspace)'
+
         - task: KubernetesManifest@1
           inputs:
             action: 'deploy'
             connectionType: 'kubernetesServiceConnection'
             kubernetesServiceConnection: 'aks-service-connection'
             namespace: 'prod'
-            manifests: 'manifests/*.yaml'
-        
-
-
-
-
+            manifests: '$(Pipeline.Workspace)/drop/manifests/*.yaml'
