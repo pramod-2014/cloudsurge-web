@@ -1,0 +1,87 @@
+trigger:
+  - main  # Git branch name
+
+
+variables:
+  dockerRegistryServiceConnection: 'docker-hub-connection'  # Azure DevOps me Docker Hub service connection ka naam
+  imageRepository: 'your-dockerhub-username/your-image-name'
+  dockerfilePath: 'Dockerfile'
+  tag: '$(Build.BuildId)'   # unique build tag
+  k8sNamespace: 'my-namespace'
+  k8sManifestFolder: 'manifests'  # yahi folder me tumhare YAML files hongi
+  nodeVersion: '18.x'
+
+stages:
+
+# ------------------------
+# Stage 1: Build Artifact
+# ------------------------
+- stage: BuildArtifact
+  displayName: "Build Application Artifact"
+  jobs:
+    - job: Build
+      displayName: "NPM Install and Build"
+      steps:
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '$(nodeVersion)'
+          displayName: 'Use Node.js $(nodeVersion)'
+
+        - script: |
+            npm install
+            npm run build
+          displayName: 'Install dependencies and build app'
+
+        - task: PublishBuildArtifacts@1
+          inputs:
+            PathtoPublish: 'dist'    # tumhare build output ka folder (React/Node project me 'dist' ya 'build')
+            ArtifactName: 'drop'
+            publishLocation: 'Container'
+
+# ------------------------
+# Stage 2: Docker Build & Push
+# ------------------------
+- stage: DockerImage
+  displayName: "Build and Push Docker Image"
+  dependsOn: BuildArtifact
+  jobs:
+    - job: Docker
+      steps:
+        - download: current
+          artifact: drop
+
+        - task: Docker@2
+          inputs:
+            containerRegistry: '$(dockerRegistryServiceConnection)'
+            repository: '$(imageRepository)'
+            command: 'buildAndPush'
+            Dockerfile: '$(dockerfilePath)'
+            tags: |
+              $(tag)
+              latest
+
+# ------------------------
+# Stage 3: Deploy to Kubernetes
+# ------------------------
+- stage: DeployK8s
+  displayName: "Deploy to Kubernetes"
+  dependsOn: DockerImage
+  jobs:
+    - deployment: Deploy
+      environment: 'k8s-dev'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: KubernetesManifest@0
+                inputs:
+                  action: 'deploy'
+                  namespace: '$(k8sNamespace)'
+                  manifests: |
+                    $(k8sManifestFolder)/namespace.yml
+                    $(k8sManifestFolder)/service.yml
+                    $(k8sManifestFolder)/deployment.yml
+                    $(k8sManifestFolder)/ingress.yml
+                  containers: |
+                    $(imageRepository):$(tag)
+
