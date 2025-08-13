@@ -35,12 +35,12 @@ stages:
             npm install
             npm run build
             mkdir -p $(Build.ArtifactStagingDirectory)
-            cp -r build/* $(Build.ArtifactStagingDirectory)/
+            cp -r build/* $(Build.ArtifactStagingDirectory)/cloudsurge-web
           displayName: 'Install dependencies and build app'
 
         - task: PublishBuildArtifacts@1
           inputs:
-            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)/cloudsurge-web'
             ArtifactName: 'drop'
             publishLocation: 'Container'
         
