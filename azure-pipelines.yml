@@ -8,7 +8,7 @@ trigger:
 pool: 
   name: "Infra-Runners-pool"
   demands:
-    - agent.name -equals office
+    - agent.name -equals kmaster
  
 variables:
   dockerRegistryServiceConnection: 'DockerHubConnection' 
@@ -56,7 +56,7 @@ stages:
     pool:
         name: "Infra-Runners-pool"
         demands:
-             - agent.name -equals office
+             - agent.name -equals kmaster
     steps:
     - checkout: self
 
