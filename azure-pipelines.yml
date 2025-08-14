@@ -5,7 +5,7 @@ variables:
   tag: '$(Build.BuildId)'
   k8sNamespace: 'prod'
   k8sManifestFolder: 'manifests'
-  nodeVersion: '18.x'
+
 
 trigger:
   branches:
