@@ -37,6 +37,12 @@ stages:
             mkdir -p $(Build.ArtifactStagingDirectory)
             cp -r build/* $(Build.ArtifactStagingDirectory)
           displayName: "Install dependencies and build app"
+          
+        - task: CopyFiles@2
+          inputs:
+            SourceFolder: '$(Build.SourcesDirectory)/build'
+            Contents: '**'
+            TargetFolder: '$(Build.ArtifactStagingDirectory)/drop'
 
         - task: PublishBuildArtifacts@1
           inputs:
