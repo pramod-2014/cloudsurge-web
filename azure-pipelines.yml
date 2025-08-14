@@ -17,7 +17,7 @@ pool:
   demands:
     - agent.name -equals office
      
-# stage one 
+# Stage 1: Install & Build
 stages:
   - stage: "nodejsInstall"
     displayName: "NodeJs Tool Installation Stage"
@@ -34,30 +34,29 @@ stages:
         - script: |
             npm install
             npm run build
-            mkdir -p $(Build.ArtifactStagingDirectory)
-            cp -r build/* $(Build.ArtifactStagingDirectory)
-          displayName: "Install dependencies and build app"
+          displayName: "Install dependencies and build Vite app"
           
+        # ✅ Copy dist/ to drop folder (for artifact)
         - task: CopyFiles@2
           inputs:
             SourceFolder: '$(Build.SourcesDirectory)/dist'
             Contents: '**'
             TargetFolder: '$(Build.ArtifactStagingDirectory)/drop'
 
+        # ✅ Publish the drop folder as artifact
         - task: PublishBuildArtifacts@1
           inputs:
-            PathtoPublish: '$(Build.ArtifactStagingDirectory)drop'
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)/drop'
             ArtifactName: 'drop'
             publishLocation: 'Container'
-        
-# ------------------------
+
 # Stage 2: Docker Build & Push
   - stage: DockerImage
     displayName: "Build and Push Docker Image"
     dependsOn: nodejsInstall
     jobs:
       - job: containerization
-        displayName: "containerization"
+        displayName: "Containerization"
         steps:
         - task: DownloadBuildArtifacts@0
           inputs:
@@ -75,14 +74,13 @@ stages:
             buildContext: '$(Pipeline.Workspace)/drop'
             tags: '$(Build.BuildId)'
          
-# ------------------------
 # Stage 3: Deploy to Kubernetes
   - stage: "DeployToAKS"
     displayName: "Deploy To Kubernetes"
     dependsOn: DockerImage
     jobs:
-      - job: "DeplpytoAKS"
-        displayName: "DeployToKubernetes"
+      - job: "DeploytoAKS"
+        displayName: "Deploy to Kubernetes"
         steps:
         - task: DownloadBuildArtifacts@0
           inputs:
