@@ -15,7 +15,7 @@ variables:
   imageRepository: 'prmd77/cloudsurgeimag'                  
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
-  manifestsFolder: 'cloudsurge-web/Deployment.yaml'
+  manifestsFolder: 'Deployment.yaml'
   aksServiceConnection: 'aks-service-connection'            
 
 stages:
