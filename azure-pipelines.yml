@@ -54,7 +54,9 @@ stages:
   jobs:
   - job: Deploy
     pool:
-      vmImage: 'ubuntu-latest'
+        name: "Infra-Runners-pool"
+        demands:
+             - agent.name -equals office
     steps:
     - checkout: self
 
