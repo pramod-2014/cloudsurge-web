@@ -12,11 +12,11 @@ pool:
  
 variables:
   dockerRegistryServiceConnection: 'DockerHubConnection' 
-  imageRepository: 'prmd77/cloudsurgeimag'                  # Docker Hub repo name
+  imageRepository: 'prmd77/cloudsurgeimag'                  
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
   manifestsFolder: 'cloudsurge-web/manifests'
-  aksServiceConnection: 'aks-service-connection'            # Tumhara AKS service connection
+  aksServiceConnection: 'aks-service-connection'            
 
 stages:
 - stage: Build_and_Push
@@ -61,7 +61,7 @@ stages:
     - checkout: self
 
     - task: KubernetesManifest@0
-      displayName: 'Deploy manifests to AKS'
+      displayName: 'Deploy manfests to AKS'
       inputs:
         action: deploy
         kubernetesServiceConnection: $(aksServiceConnection)
