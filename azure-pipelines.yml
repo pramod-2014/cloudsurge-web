@@ -39,7 +39,7 @@ stages:
         # ✅ Copy dist/ to drop folder (for artifact)
         - task: CopyFiles@2
           inputs:
-            SourceFolder: '$(Build.SourcesDirectory)/buid'
+            SourceFolder: '$(Build.SourcesDirectory)/build'
             Contents: '**'
             TargetFolder: '$(Build.ArtifactStagingDirectory)/drop'
 
