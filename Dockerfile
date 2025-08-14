@@ -18,6 +18,7 @@ COPY . .
 FROM node:20-alpine AS production
 WORKDIR /app
 
+
 # Copy only necessary artifacts and dependencies
 COPY --from=build /app ./
 
