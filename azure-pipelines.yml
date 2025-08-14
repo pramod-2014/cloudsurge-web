@@ -1,10 +1,3 @@
-variables:
-  dockerRegistryServiceConnection: 'docker-hub-connection'
-  imageRepository: 'prmd77/cloudsurgeimag'
-  dockerfilePath: 'Dockerfile'
-  tag: '$(Build.BuildId)'
-  k8sNamespace: 'prod'
-  k8sManifestFolder: 'manifests'
 
 
 trigger:
@@ -16,83 +9,63 @@ pool:
   name: "Infra-Runners-pool"
   demands:
     - agent.name -equals office
-     
-# Stage 1: Install & Build
+ 
+variables:
+  dockerRegistryServiceConnection: 'DockerHubConnection' 
+  imageRepository: 'prmd77/cloudsurgeimag'                  # Docker Hub repo name
+  dockerfilePath: 'cloudsurge-web-main/manisfests/Dockerfile'
+  tag: '$(Build.BuildId)'
+  manifestsFolder: 'cloudsurge-web-main/manisfests'
+  aksServiceConnection: 'aks-service-connection'            # Tumhara AKS service connection
+
 stages:
-  - stage: "nodejsInstall"
-    displayName: "NodeJs Tool Installation Stage"
-    jobs:
-      - job: "nodejsInstallJob"
-        displayName: "NPM Install and Build"
-        steps:
-        - task: NodeTool@0
-          inputs:
-            versionSource: 'spec'
-            versionSpec: '18'
-            checkLatest: true
+- stage: Build_and_Push
+  displayName: "Build & Push Docker Image"
+  jobs:
+  - job: Build
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - checkout: self
 
-        - script: |
-            npm install
-            npm run build
-          displayName: "Install dependencies and build Vite app"
-          
-        # ✅ Copy dist/ to drop folder (for artifact)
-        - task: CopyFiles@2
-          inputs:
-            SourceFolder: '$(Build.SourcesDirectory)/dist'
-            Contents: '**'
-            TargetFolder: '$(Build.ArtifactStagingDirectory)/drop'
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x'   # Node version for build
+      displayName: 'Install Node.js'
 
-        # ✅ Publish the drop folder as artifact
-        - task: PublishBuildArtifacts@1
-          inputs:
-            PathtoPublish: '$(Build.ArtifactStagingDirectory)/drop'
-            ArtifactName: 'drop'
-            publishLocation: 'Container'
+    - script: |
+        cd cloudsurge-web-main
+        npm install
+        npm run build
+      displayName: 'Install dependencies & Build app'
 
-# Stage 2: Docker Build & Push
-  - stage: DockerImage
-    displayName: "Build and Push Docker Image"
-    dependsOn: nodejsInstall
-    jobs:
-      - job: containerization
-        displayName: "Containerization"
-        steps:
-        - task: DownloadBuildArtifacts@0
-          inputs:
-            buildType: 'current'
-            downloadType: 'single'
-            artifactName: 'drop'
-            downloadPath: '$(Pipeline.Workspace)'
+    - task: Docker@2
+      displayName: 'Build and Push Docker image'
+      inputs:
+        containerRegistry: $(dockerRegistryServiceConnection)
+        repository: $(imageRepository)
+        command: 'buildAndPush'
+        Dockerfile: $(dockerfilePath)
+        tags: |
+          $(tag)
 
-        - task: Docker@2
-          inputs:
-            containerRegistry: 'DockerHubConnection'
-            repository: 'prmd77/cloudsurgeimag'
-            command: 'buildAndPush'
-            Dockerfile: '**/Dockerfile'
-            buildContext: '$(Pipeline.Workspace)/drop'
-            tags: '$(Build.BuildId)'
-         
-# Stage 3: Deploy to Kubernetes
-  - stage: "DeployToAKS"
-    displayName: "Deploy To Kubernetes"
-    dependsOn: DockerImage
-    jobs:
-      - job: "DeploytoAKS"
-        displayName: "Deploy to Kubernetes"
-        steps:
-        - task: DownloadBuildArtifacts@0
-          inputs:
-            buildType: 'current'
-            downloadType: 'single'
-            artifactName: 'drop'
-            downloadPath: '$(Pipeline.Workspace)'
+- stage: Deploy_to_AKS
+  displayName: "Deploy to AKS"
+  dependsOn: Build_and_Push
+  jobs:
+  - job: Deploy
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - checkout: self
 
-        - task: KubernetesManifest@1
-          inputs:
-            action: 'deploy'
-            connectionType: 'kubernetesServiceConnection'
-            kubernetesServiceConnection: 'aks-service-connection'
-            namespace: 'prod'
-            manifests: '$(Pipeline.Workspace)/drop/manifests/*.yaml'
+    - task: KubernetesManifest@0
+      displayName: 'Deploy manifests to AKS'
+      inputs:
+        action: deploy
+        kubernetesServiceConnection: $(aksServiceConnection)
+        namespace: default
+        manifests: |
+          $(manifestsFolder)/Deployment.yaml
+      env:
+        DOCKER_IMAGE: "$(imageRepository):$(tag)"
