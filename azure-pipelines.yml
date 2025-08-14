@@ -13,9 +13,9 @@ pool:
 variables:
   dockerRegistryServiceConnection: 'DockerHubConnection' 
   imageRepository: 'prmd77/cloudsurgeimag'                  # Docker Hub repo name
-  dockerfilePath: 'cloudsurge-web-main/manisfests/Dockerfile'
+  dockerfilePath: 'cloudsurge-web-main/manifests/Dockerfile'
   tag: '$(Build.BuildId)'
-  manifestsFolder: 'cloudsurge-web-main/manisfests'
+  manifestsFolder: 'cloudsurge-web-main/manifests'
   aksServiceConnection: 'aks-service-connection'            # Tumhara AKS service connection
 
 stages:
