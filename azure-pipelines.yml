@@ -67,6 +67,6 @@ stages:
         kubernetesServiceConnection: $(aksServiceConnection)
         namespace: default
         manifests: |
-          $(manifestsFolder)/Deployment.yaml
+          $(manifestsFolder)
       env:
         DOCKER_IMAGE: "$(imageRepository):$(tag)"
