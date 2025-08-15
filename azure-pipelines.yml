@@ -45,8 +45,7 @@ stages:
         repository: $(imageRepository)
         command: 'buildAndPush'
         Dockerfile: $(dockerfilePath)
-        tags: |
-          $(tag)
+      
 
 - stage: Deploy_to_AKS
   displayName: "Deploy to AKS"
@@ -69,4 +68,4 @@ stages:
         manifests: |
           $(manifestsFolder)
       env:
-        DOCKER_IMAGE: "$(imageRepository):$(tag)"
+        DOCKER_IMAGE: "prmd77/cloudsurgeimag:311"
