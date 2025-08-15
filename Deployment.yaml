@@ -15,8 +15,10 @@ spec:
       containers:
         - name: cloudsurge-container
           image: prmd77/cloudsurge:latest
-          ports:
-            - containerPort: 80
+      imagePullSecrets:
+          -  name: dockerhub-secret
+             ports:
+             - containerPort: 80
 
 ---
 apiVersion: v1
