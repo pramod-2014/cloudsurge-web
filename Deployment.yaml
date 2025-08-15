@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: cloudsurge-container
-          image: prmd77/cloudsurgeimag:latest # Pipeline auto update करेगा
+          image: $(imageRepository):$(tag) # Pipeline auto update करेगा
           ports:
             - containerPort: 80
           resources:
