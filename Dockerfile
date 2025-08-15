@@ -5,10 +5,10 @@ WORKDIR /app
 # Copy dependency definitions
 COPY package*.json ./
 
-# Install all dependencies
+# Install dependencies
 RUN npm ci
 
-# Copy rest of the app code
+# Copy rest of the code
 COPY . .
 
 # Build Vite project
@@ -24,9 +24,8 @@ RUN npm install -g serve
 # Copy only built files from build stage
 COPY --from=build /app/dist ./dist
 
-# Expose port
-EXPOSE 3000
+# Expose port 80 for production
+EXPOSE 80
 
-# Start server to serve built files
-CMD ["serve", "-s", "dist", "-l", "3000"]
-
+# Start server on port 80
+CMD ["serve", "-s", "dist", "-l", "80"]
