@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: cloudsurge-container
-          image: prmd77/cloudsurge:latest
+          image: prmd77/cloudsurgeimag:306
           ports:
              - containerPort: 80
       imagePullSecrets:
