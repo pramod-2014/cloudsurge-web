@@ -7,7 +7,7 @@ trigger:
 pool:
  name: Infra-Runners-pool
  demands: 
- - kmaster
+  - kmaster
 
 stages:
   - stage: deployToAKS
