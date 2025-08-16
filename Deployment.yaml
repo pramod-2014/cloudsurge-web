@@ -2,53 +2,20 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cloudsurge-deployment
+  labels:
+    app: cloudsurge
 spec:
   replicas: 2
-  revisionHistoryLimit: 3
   selector:
     matchLabels:
       app: cloudsurge
   template:
     metadata:
-      labels: 
+      labels:
         app: cloudsurge
     spec:
       containers:
-        - name: cloudsurge-container
-          image: $(imageRepository):$(tag) # Pipeline auto update करेगा
-          ports:
-            - containerPort: 80
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "500m"
-              memory: "256Mi"
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 3
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 10
-            periodSeconds: 30
-      imagePullSecrets:
-        - name: dockerhub-secret
-      
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: cloudsurge-service
-spec: 
-  type: LoadBalancer
-  selector: 
-    app: cloudsurge 
-  ports: 
-    - port: 80
-      targetPort: 80
+      - name: cloudsurge
+        image: prmd77/cloudsurgeimag:312
+        ports:
+        - containerPort: 80
