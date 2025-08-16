@@ -4,10 +4,10 @@ trigger:
      - main
 
 
-pool:
- name: Infra-Runners-pool
- demands: 
-  - kmaster
+pool: 
+  name: "Infra-Runners-pool"
+  demands:
+    - agent.name -equals kmaster
 
 stages:
   - stage: deployToAKS
