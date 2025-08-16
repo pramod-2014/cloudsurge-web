@@ -4,6 +4,7 @@ metadata:
   name: cloudsurge-deployment
   labels:
     app: cloudsurge
+    type: frontend
 spec:
   replicas: 2
   selector:
