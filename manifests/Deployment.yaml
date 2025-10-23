@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: cloudsurge
-        image: prmd77/cloudsurgeimag:312
+        image:  myacrbluegreen.azurecr.io/myapp:blue
         ports:
         - containerPort: 80
