@@ -60,7 +60,7 @@ const Index = () => {
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-primary-foreground leading-tight">
               Transform Your Business with 
               <span className="block text-transparent bg-gradient-to-r from-primary-glow to-accent bg-clip-text animate-pulse-glow">
-                Cloud Excellence
+                DevOps Enineer Pramod
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-primary-foreground/90 mb-8 max-w-3xl mx-auto leading-relaxed">
