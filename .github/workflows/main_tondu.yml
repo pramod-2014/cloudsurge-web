@@ -62,4 +62,5 @@ jobs:
           app-name: 'tondu'
           slot-name: 'Production'
           package: .
+
           
