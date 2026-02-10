@@ -4,10 +4,14 @@ trigger:
      - main
 
 
+variables:
+  SONAR_TOKEN: $(SONAR_TOKEN)
+  SONAR_PROJECT_KEY: $(SONAR_PROJECT_KEY)
+  SONAR_ORG: $(SONAR_ORG)
+
 pool: 
   name: "Infra-Runners-pool"
-  demands:
-    - agent.name -equals kmaster
+
 
 stages:
   - stage: Scan
@@ -16,5 +20,31 @@ stages:
       - job: Scand
         displayName: "scan with sonqube cloud"
         steps:
-        -
+        - task: SonarCloudPrepare@4
+          inputs:
+            SonarQube: 'sonarqube-service-connection'
+            organization: '$(SONAR_ORG)'
+            scannerMode: 'dotnet'
+            projectKey: '$(SONAR_PROJECT_KEY)'
+            projectName: 'cloudsurge-web'
+
+  - stage: 'Build'
+    displayName: 'Build Stage'
+    jobs:
+      - job: 'Build'
+        displayName: 'install dependencies'
+        steps:
+        - task: 'Npm@1'
+          inputs:
+            command: 'install'
+            workingDir: '$(System.DefaultWorkingDirectory)/cloudsurge-web'
+      - job: npmRun
+        displayName: 'npm run job'
+        steps:
+        - task: Npm@1
+          inputs:
+            command: 'custom'
+            workingDir: '''$(System.DefaultWorkingDirectory)/cloudsurge-web'''
+            customCommand: 'npm run build'
+        
     
