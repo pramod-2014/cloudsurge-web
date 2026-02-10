@@ -11,17 +11,10 @@ pool:
 
 stages:
   - stage: Scan
-    displayName: scan with 
+    displayName: "scan with sonqube cloud"
     jobs:
-      - job: deploymentJob
-        displayName: Delpoyment web Applicaton Job
+      - job: Scand
+        displayName: "scan with sonqube cloud"
         steps:
-        - task: KubernetesManifest@1
-          inputs:
-            action: 'deploy'
-            connectionType: 'kubernetesServiceConnection'
-            kubernetesServiceConnection: 'aks-service-connection'
-            namespace: 'default'
-            manifests: 'manifests/*.yaml'
-        
+        -
     
