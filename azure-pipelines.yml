@@ -10,8 +10,8 @@ pool:
     - agent.name -equals kmaster
 
 stages:
-  - stage: deployToAKS
-    displayName: Delpoy web Applicaton CloudWeb
+  - stage: Scan
+    displayName: scan with 
     jobs:
       - job: deploymentJob
         displayName: Delpoyment web Applicaton Job
