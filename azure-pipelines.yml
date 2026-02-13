@@ -49,7 +49,6 @@ stages:
       - job: Build
         displayName: "Install Dependencies"
         steps:
-<<<<<<< HEAD
           - task: Npm@1
             inputs:
               command: 'install'
@@ -64,12 +63,3 @@ stages:
               command: 'custom'
               workingDir: '$(System.DefaultWorkingDirectory)/cloudsurge-web'
               customCommand: 'npm run build'
-=======
-        - task: Npm@1
-          inputs:
-            command: 'custom'
-            workingDir: '''$(System.DefaultWorkingDirectory)/cloudsurge-web'
-            customCommand: 'npm run build'
-        
-    
->>>>>>> 1503847e0e27bf198d6090e72b0ea86411ddf091
