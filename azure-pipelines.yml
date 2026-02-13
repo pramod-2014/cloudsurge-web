@@ -3,7 +3,6 @@ trigger:
    include:
      - main
 
-
 variables:
   SONAR_TOKEN: $(SONAR_TOKEN)
   SONAR_PROJECT_KEY: pramod-2014_cloudsurge-web
