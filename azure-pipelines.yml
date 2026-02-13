@@ -11,7 +11,7 @@ variables:
 pool: 
   name: "devPool"
   demands:
-    - Agent.Name -equals hommelap7480   # typo fix
+    - Agent.Name -equals hommelap7480   
 
 stages:
 
