@@ -72,7 +72,7 @@ stages:
           inputs:
             containerRegistry: 'dockerHub'
             repository: 'prmd77'
-            command: 'buildAndPush'
+            command: 'build'
             Dockerfile: '**/Dockerfile'
 
         
