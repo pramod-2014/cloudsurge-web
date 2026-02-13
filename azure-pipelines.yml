@@ -10,7 +10,10 @@ variables:
   SONAR_ORG: $(SONAR_ORG)
 
 pool: 
-  name: "Infra-Runners-pool"
+  name: "devPool"
+  demands:
+   - Agent.Name -equals homlep7480
+
 
 
 stages:
