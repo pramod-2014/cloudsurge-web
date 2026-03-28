@@ -1,0 +1,13 @@
+trigger:
+- main
+
+variables:
+  imageName: 'prmd77/frontend-app-templat'
+  tag: 'v1.0'
+
+stages:
+- template: templates/main-pipeline.yml
+  parameters:
+    imageName: $(imageName)
+    tag: $(tag)
+    runDeployStage: false   # Agar abhi deploy skip karna ho
