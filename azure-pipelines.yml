@@ -3,22 +3,7 @@ trigger:
 
 variables:
   imageName: 'prmd77/frontend-app-templat'
-  tag: '$(Build.BuildId)'
+  tag: 'v1.0'
 
 stages:
-- template: templates/build.yml
-  parameters:
-    imageName: $(imageName)
-    tag: $(tag)
-
-- template: templates/push.yml
-  parameters:
-    imageName: $(imageName)
-    tag: $(tag)
-    dockerRegistryServiceConnection: 'docker-registry-service-connection'
-
-# - template: templates/deploy.yml
-#   parameters:
-#     imageName: $(imageName)
-#     tag: $(tag)
-#     aksServiceConnection: 'aks-connection'
+- template: templates/main-pipeline.yml
